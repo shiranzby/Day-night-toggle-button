@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Day-Night Toggle — 三版本对比</title>
+<title>Day-Night Toggle — 五版本对比</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -15,9 +15,9 @@
   body.dark { background: #0f172a; color: #f1f5f9; }
   h1 { text-align: center; font-size: 26px; margin-bottom: 8px; }
   .sub { text-align: center; font-size: 14px; opacity: .6; margin-bottom: 30px; }
-  .grid { display: grid; grid-template-columns: repeat(2, 320px); gap: 40px; justify-content: center; max-width: 720px; margin: 0 auto; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 320px)); gap: 24px; justify-content: center; max-width: 1020px; margin: 0 auto; }
   .card {
-    flex: 0 0 320px; max-width: 320px;
+    min-width: 0; width: 100%; max-width: 320px;
     background: #fff; border: 1px solid #e2e8f0; border-radius: 16px;
     padding: 30px 20px 24px; text-align: center;
   }
@@ -28,6 +28,14 @@
   .card .tags { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin-top: 12px; }
   .tag { font-size: 11px; padding: 2px 8px; border-radius: 10px; background: #e2e8f0; color: #475569; }
   body.dark .tag { background: #334155; color: #94a3b8; }
+  .card .links { margin-top: 16px; display: flex; justify-content: center; gap: 16px; font-size: 13px; }
+  .card a { color: inherit; text-underline-offset: 3px; }
+  .recommended { font-size: 11px; font-weight: 500; margin-left: 4px; vertical-align: middle; }
+  .v5 .tw { margin: 4px 0; min-height: 80px; }
+  #v5frame { display: block; width: 100%; height: 80px; border: 0; background: transparent; }
+  :root[data-comparison-vt] body { transition: none; }
+  @media (max-width: 600px) { body { padding: 28px 16px; } h1 { font-size: 23px; } .grid { gap: 20px; } }
+  @media (prefers-reduced-motion: reduce) { body, .cmp * { animation: none !important; transition: none !important; } }
 
   /* ==================== 共用轨道样式 ==================== */
   .cmp { cursor: pointer; width: 90px; height: 35px; position: relative; display: inline-block; }
@@ -101,7 +109,7 @@
 <body>
 
 <h1>🌗 白天黑夜切换按钮 · 版本对比</h1>
-<p class="sub">点击任意按钮切换 · 其他自动同步 · 点击空白卡片区直接切换 body 主题</p>
+<p class="sub">点击任意版本的按钮切换 · 其余四个同步 · v5.0 提供独立接入与长页适配</p>
 
 <div class="grid">
 
@@ -159,6 +167,17 @@
     <theme-button value="light" size="1.5"></theme-button>
   </div>
   <div class="tags"><span class="tag">Shadow DOM</span><span class="tag">自定义 size</span><span class="tag">自动跟随系统</span></div>
+</div>
+
+<!-- ===== v5.0 (isolated module, parent owns comparison state) ===== -->
+<div class="card v5">
+  <h2>🌗 v5.0 <span class="recommended">推荐接入</span></h2>
+  <div class="ver">模块化组件 · 长页与移动端适配</div>
+  <div class="tw" id="v5wrap">
+    <iframe id="v5frame" src="v5.0/index.html?embed=1" title="v5.0 日夜主题切换按钮" scrolling="no"></iframe>
+  </div>
+  <div class="tags"><span class="tag">职责分离</span><span class="tag">局部颜色波</span><span class="tag">键盘与减少动态</span></div>
+  <div class="links"><a href="v5.0/">独立演示</a><a href="examples/long-page.html">长页示例</a></div>
 </div>
 
 </div>
@@ -402,8 +421,9 @@ const v2 = makeToggle('t2');
 /* =========================================================
    全局同步 + 涟漪动画
    ========================================================= */
-let _syncing = false;
+let _syncId = 0, _activeVT = null;
 let _clickX = 0, _clickY = 0;
+const v5frame = document.getElementById('v5frame');
 
 // Track click position globally (capture phase, before any handler)
 document.addEventListener('click', e => { _clickX = e.clientX; _clickY = e.clientY; }, true);
@@ -426,28 +446,62 @@ function doSyncBody(dark) {
   }
   syncTB('v3wrap', dark);
   syncTB('v4wrap', dark);
+  v5frame.contentWindow?.postMessage({ type: 'shiran-demo-theme', theme: dark ? 'dark' : 'light' }, location.origin);
 }
 
 function syncBody(dark) {
-  if (_syncing) return;
-  _syncing = true;
-  
-  if (document.startViewTransition) {
+  const id = ++_syncId;
+  _activeVT?.skipTransition();
+  _activeVT = null;
+  const root = document.documentElement;
+  root.removeAttribute('data-comparison-vt');
+  if (!document.startViewTransition || matchMedia('(prefers-reduced-motion:reduce)').matches) {
+    doSyncBody(dark);
+    return;
+  }
+  const finish = () => {
+    if (id !== _syncId) return;
+    root.removeAttribute('data-comparison-vt');
+    _activeVT = null;
+  };
+  const direct = () => {
+    if (id !== _syncId) return;
+    doSyncBody(dark);
+    _activeVT?.skipTransition();
+    finish();
+  };
+  try {
+    root.setAttribute('data-comparison-vt', '');
     const cx = _clickX, cy = _clickY;
     const endRadius = Math.hypot(Math.max(cx, innerWidth - cx), Math.max(cy, innerHeight - cy));
-    const vt = document.startViewTransition(() => doSyncBody(dark));
+    const vt = document.startViewTransition(() => { if (id === _syncId) doSyncBody(dark); });
+    _activeVT = vt;
+    const timer = setTimeout(direct, 700);
     vt.ready.then(() => {
-      document.documentElement.animate(
+      clearTimeout(timer);
+      if (id !== _syncId) return;
+      const animation = root.animate(
         { clipPath: ['circle(0 at ' + cx + 'px ' + cy + 'px)', 'circle(' + endRadius + 'px at ' + cx + 'px ' + cy + 'px)'] },
         { duration: 1400, easing: 'cubic-bezier(0.4,0,0.5,1)', fill: 'forwards', pseudoElement: '::view-transition-new(root)' }
       );
-      _syncing = false;
-    });
-  } else {
-    doSyncBody(dark);
-    _syncing = false;
-  }
+      animation.finished.then(finish, direct);
+    }).catch(() => { clearTimeout(timer); direct(); });
+    vt.finished.catch(() => { clearTimeout(timer); direct(); });
+  } catch (_) { direct(); }
 }
+
+v5frame.addEventListener('load', () => {
+  v5frame.contentWindow?.postMessage({ type: 'shiran-demo-theme', theme: document.body.classList.contains('dark') ? 'dark' : 'light' }, location.origin);
+});
+window.addEventListener('message', event => {
+  if (event.origin !== location.origin || event.source !== v5frame.contentWindow || event.data?.type !== 'shiran-demo-change') return;
+  if (event.data.theme !== 'light' && event.data.theme !== 'dark') return;
+  const rect = v5frame.getBoundingClientRect();
+  const point = event.data.point;
+  _clickX = rect.left + (point && Number.isFinite(point.x) ? point.x : rect.width / 2);
+  _clickY = rect.top + (point && Number.isFinite(point.y) ? point.y : rect.height / 2);
+  syncBody(event.data.theme === 'dark');
+});
 
 v1.el.addEventListener('click', () => syncBody(v1.isDark()));
 v2.el.addEventListener('click', () => syncBody(v2.isDark()));

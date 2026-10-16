@@ -1,0 +1,27 @@
+:root { --bg: #fff; --fg: #1f2328; --muted: #59636e; --line: #d8dee4; --panel: #f6f8fa; --header-height: 69px; color-scheme: light; }
+:root[data-theme=dark] { --bg: #0d1117; --fg: #e6edf3; --muted: #9198a1; --line: #30363d; --panel: #161b22; color-scheme: dark; }
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.65 system-ui, sans-serif; }
+header { position: sticky; top: 0; z-index: 60; display: flex; gap: 12px; align-items: center; height: var(--header-height); padding: 12px 20px; background: var(--panel); border-bottom: 1px solid var(--line); }
+header strong { flex: 1; }
+button, a { font: inherit; }
+button { color: var(--fg); background: var(--panel); border: 1px solid var(--line); border-radius: 5px; min-height: 44px; padding: 6px 12px; cursor: pointer; }
+main { max-width: 840px; margin: auto; padding: 24px; }
+h1 { font-size: 26px; } h2 { font-size: 21px; scroll-margin-top: 96px; }
+h1,h2,p,li,td,th,a,pre,blockquote { color: var(--fg); }
+section { margin: 24px 0; } a { text-decoration-thickness: 1px; }
+pre { max-width: 100%; overflow-x: auto; background: var(--panel); border: 1px solid var(--line); padding: 16px; font: 14px/21px ui-monospace, monospace; }
+/* 仅在固定行高、不自动换行并写入真实行数时使用；不通用于普通正文。 */
+pre[data-code-lines] { white-space: pre; content-visibility: auto; contain-intrinsic-block-size: auto calc(var(--code-lines) * 21px); }
+table { display: block; overflow-x: auto; max-width: 100%; border-collapse: collapse; }
+td, th { padding: 10px; border: 1px solid var(--line); }
+[data-theme-image-frame] { display: block; position: relative; width: 320px; max-width: 100%; aspect-ratio: 16/9; margin: 20px 0; }
+[data-theme-image-frame] > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.drawer { position: fixed; left: 0; top: var(--header-height); bottom: 0; z-index: 80; width: min(280px, 85vw); background: var(--bg); border-right: 1px solid var(--line); padding: 20px; transform: translateX(-100%); transition: transform .22s ease; overflow-y: auto; }
+.drawer.open { transform: translateX(0); }
+.drawer a { display: block; padding: 8px 0; }
+.desktop-outline { display: none; }
+.desktop-outline a { display: block; padding: 4px 0; }
+@media (min-width: 1280px) { .desktop-outline { display: block; position: fixed; right: 10px; top: 100px; width: 170px; z-index: 7; max-height: 70vh; overflow: auto; } }
+@media (max-width: 600px) { :root { --header-height: 100px; } header { flex-wrap: wrap; padding: 8px 12px; } header strong { flex-basis: 100%; } main { padding: 16px; } }
+@media print { header,.drawer,.desktop-outline { display: none; } pre[data-code-lines] { content-visibility: visible !important; contain-intrinsic-block-size: none !important; } }

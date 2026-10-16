@@ -1,0 +1,12 @@
+/* 原生快照规则仅在本控制器活跃时启用，不污染其他 View Transition。 */
+:root[data-shiran-vt]::view-transition-old(root),
+:root[data-shiran-vt]::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+:root[data-shiran-vt]::view-transition-group(root) { animation-duration: 0s; }
+:root[data-shiran-vt]::view-transition-old(root) { z-index: 1; }
+:root[data-shiran-vt]::view-transition-new(root) { z-index: 2; }
+
+/* 轻量圆盘必须位于透明阅读层之下；遮罩覆盖正文不是同一种效果。 */
+.shiran-theme-layer { position: fixed; inset: 0; z-index: var(--shiran-ripple-z, 5); overflow: hidden; pointer-events: none; }
+.shiran-theme-disk { position: absolute; width: 20px; height: 20px; border-radius: 50%; opacity: 1; will-change: transform; pointer-events: none; }
+.shiran-theme-content { position: relative; z-index: var(--shiran-content-z, 6); }
+@media print { .shiran-theme-layer { display: none !important; } }

@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Shiran Theme Toggle · v5.0</title>
+  <script>
+    (() => {
+      const embedded = new URLSearchParams(location.search).get('embed') === '1' && parent !== window;
+      document.documentElement.dataset.embedded = String(embedded);
+      if (embedded) return;
+      let theme;
+      try { theme = localStorage.getItem('shiran-v5-demo'); } catch (_) {}
+      document.documentElement.dataset.theme = theme === 'light' || theme === 'dark' ? theme : (matchMedia('(prefers-color-scheme:dark)').matches ? 'dark' : 'light');
+    })();
+  </script>
+  <link rel="stylesheet" href="../components/theme-reveal.css">
+  <link rel="stylesheet" href="demo.css">
+</head>
+<body>
+  <header class="standalone"><a href="../">五版本对比</a><span>Shiran Theme Toggle · v5.0</span><button id="system" type="button">跟随系统</button></header>
+  <main class="shiran-theme-content" id="content">
+    <h1 class="standalone">日夜主题切换 · v5.0</h1>
+    <p class="intro standalone">保留太阳、月亮与云朵，让按钮、主题状态和页面动效各自独立。</p>
+    <div class="button-slot"><theme-button size="1.8" aria-label="切换日夜主题"></theme-button></div>
+    <p class="status standalone" id="status" role="status" aria-live="polite"></p>
+    <section class="standalone"><h2>同一按钮，不同页面策略</h2><p>普通桌面页面可采用圆形快照揭示；移动端使用局部颜色波与底色圆盘。超长页面提前选择轻量路径，不在点击时扫描整章。</p></section>
+    <section class="standalone"><h2>接入保留原页面</h2><p>状态只由一个控制器管理，支持保存偏好、系统跟随、键盘切换和减少动态效果。已有主题状态的应用也可以只接入按钮。</p><nav><a href="../examples/long-page.html">长页面适配示例</a><a href="../examples/basic.html">最小接入示例</a><a href="../AI-INTEGRATION.md">AI 接入指南</a></nav></section>
+  </main>
+  <script type="module" src="demo.js"></script>
+</body>
+</html>

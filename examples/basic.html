@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN" data-theme="light">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>主题控件 · 普通页面接入</title>
+  <script>
+    (()=>{let t;try{t=localStorage.getItem('shiran-example');}catch(_){}document.documentElement.dataset.theme=t==='light'||t==='dark'?t:(matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light');})();
+  </script>
+  <link rel="stylesheet" href="../components/theme-reveal.css">
+  <link rel="stylesheet" href="example.css">
+</head>
+<body>
+  <header><strong>普通页面接入</strong><button id="system">跟随系统</button><theme-button size="1.8" aria-label="切换日夜主题"></theme-button></header>
+  <main class="shiran-theme-content" id="content">
+    <h1>按钮与页面切换分开管理</h1>
+    <p>桌面默认圆形原生快照；手机使用当前可见内容的颜色波与底色圆盘。减弱动态效果时直接换色。</p>
+    <section><h2>接入只改主题变量</h2><p>按钮不直接修改页面背景，不保存偏好，也不监听系统主题；这些由唯一控制器处理。</p><blockquote>保留原页面结构、滚动位置和链接，避免把整站塞进全屏遮罩。</blockquote></section>
+    <section><h2>验证操作</h2><p>切两次主题、刷新、用键盘切换、打开系统主题跟随，再缩放窗口。</p><a href="long-page.html">查看长页面适配示例</a></section>
+  </main>
+  <script type="module">
+    import { createThemeController } from '../components/theme-controller.js';
+    import { createFlowWave } from '../adapters/flow-wave.js';
+    const wave=createFlowWave({content:document.querySelector('#content'),shells:[document.body,document.querySelector('header')],targetSelector:'body,header,button,h1,h2,p,a,blockquote'});
+    const controller=createThemeController({storageKey:'shiran-example',wave,surfaces:[document.querySelector('header'),document.querySelector('#content')]});
+    document.querySelector('#system').onclick=()=>controller.followSystem();
+    window.example={controller,wave};
+  </script>
+</body>
+</html>

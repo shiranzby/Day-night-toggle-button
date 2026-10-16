@@ -6,3 +6,9 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# 本地验收证据与运行缓存（不发布）
+test-results/
+__pycache__/
+*.pyc
+node_modules/
