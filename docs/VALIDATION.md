@@ -10,6 +10,7 @@
 npm run check
 python tests/browser_smoke.py
 python tests/version_smoke.py
+python tests/coordinate_smoke.py
 ```
 
 测试使用临时本地端口，结束关闭服务和浏览器。可通过 `CHROME_PATH` 指向自己的独立 Chromium；不在仓库硬编码某位开发者的路径。`test-results/` 为本地证据，不提交公开仓库。
@@ -17,6 +18,10 @@ python tests/version_smoke.py
 覆盖普通页390手机/1440桌面、状态持久化/系统跟随、键盘、disabled、重连、程序value静默、减少动态效果、快速反切；长页覆盖隐藏右大纲、常驻抽屉、pre横滚不重建、table横滚更新、固定图片load不重建、未知图load更新、深滚动、宽高、打印和销毁清理。使用真实scroll/load并检查状态变化，不只是手工派发同名事件。
 
 `version_smoke.py` 另验五版本逐个点击同步、iframe来源校验、嵌入键盘/减少动态效果、快速反切、v5独立页持久化/系统跟随、模块资源与手机宽度。对比页的五个按钮不混用两套同名注册；独立v5才运行新版页面控制器。
+
+`coordinate_smoke.py` 用真实鼠标/触摸分别点击按钮两端，检查首击与快速第二击的圆盘中心、本次 `event.point` 和原 `detail` 字符串；同时检查Enter/Space/程序 `.click()` 不复用旧点、销毁后解绑，以及iframe桥传递本次局部坐标。`--label before` / `--label after` 可保存修复前后报告，旧实现应被这些断言拒绝。
+
+发布后可用 `python tests/coordinate_smoke.py --base https://shiranzby.github.io/Day-night-toggle-button/ --label online` 验证实际线上资源，不启动本地服务。报告与截图仍只写入 ignored `test-results/`，线上与本地报告分开保留。
 
 本仓库不含shydoc的付费课程原文、图床或部署密钥。合成示例通过，不等于原站全量回归；历史站点证据单独记录在PERFORMANCE.md。
 

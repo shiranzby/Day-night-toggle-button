@@ -89,13 +89,13 @@ class ThemeButton extends HTMLElement {
         event.stopImmediatePropagation();
         return;
       }
-      this._activate();
+      this._activate(event);
     }, true);
     this.addEventListener('keydown', event => {
       if (!['Enter', ' ', 'Spacebar'].includes(event.key)) return;
       event.preventDefault();
       if (this.disabled) event.stopImmediatePropagation();
-      else if (!event.repeat) this._activate();
+      else if (!event.repeat) this._activate(event);
     });
     shadow.querySelector('.mb').addEventListener('mousemove', () => {
       if (!this.disabled && this._hoverMedia.matches && performance.now() - this._lastToggle >= 500) this._scene.classList.add('hover');
@@ -158,10 +158,16 @@ class ThemeButton extends HTMLElement {
     this._wasDisabled = this.disabled;
   }
 
-  _activate() {
+  _activate(source) {
     this._lastToggle = performance.now();
     this.value = this.value === 'dark' ? 'light' : 'dark';
-    this.dispatchEvent(new CustomEvent('change', {detail:this.value, bubbles:true, composed:true}));
+    const point = source?.type === 'click' && source.detail > 0 &&
+      Number.isFinite(source.clientX) && Number.isFinite(source.clientY)
+      ? {x:source.clientX, y:source.clientY} : null;
+    const event = new CustomEvent('change', {detail:this.value, bubbles:true, composed:true});
+    // 同步派发前绑定本次坐标，不依赖宿主与控制器 click 监听的注册顺序。
+    Object.defineProperty(event, 'point', {value:point, enumerable:true});
+    this.dispatchEvent(event);
   }
 }
 

@@ -7,6 +7,7 @@
   "scripts": {
     "check": "node --check components/theme-button.js && node --check components/theme-controller.js && node --check adapters/flow-wave.js && node --check examples/long-page.js && node --check v5.0/demo.js && node tests/check-html-scripts.js",
     "test:browser": "python tests/browser_smoke.py",
-    "test:versions": "python tests/version_smoke.py"
+    "test:versions": "python tests/version_smoke.py",
+    "test:coordinates": "python tests/coordinate_smoke.py"
   }
 }

@@ -21,7 +21,6 @@ export function createThemeController(options = {}) {
   const backgrounds = { light: '#ffffff', dark: '#0d1117', ...options.backgrounds };
   const system = matchMedia('(prefers-color-scheme: dark)');
   const reduce = matchMedia('(prefers-reduced-motion: reduce)');
-  const points = new WeakMap();
   const cleanups = [];
   let preference = null;
   let theme;
@@ -168,15 +167,9 @@ export function createThemeController(options = {}) {
     });
   }
   for (const button of buttons) {
-    listen(button, 'click', event => {
-      if (event.detail > 0) points.set(button, { x: event.clientX, y: event.clientY });
-      else points.delete(button); // 键盘/程序调用不能复用先前指针坐标。
-    }, true);
     listen(button, 'change', event => {
       if (event.target !== button || !valid(event.detail)) return;
-      const point = points.get(button) || null;
-      points.delete(button);
-      setTheme(event.detail, { point });
+      setTheme(event.detail, { point:event.point || null });
     });
   }
   listen(system, 'change', () => { if (!preference) setTheme(system.matches ? 'dark' : 'light', { persist: false }); });

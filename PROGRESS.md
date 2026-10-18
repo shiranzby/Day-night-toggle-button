@@ -1,5 +1,17 @@
 # v5.0 当前交付
 
+当前状态（2026-10-19）：用户已授权将点击坐标修复推送 GitHub，本地验证完成且远端无新增提交，正在正常发布 `master`；Pages 对应提交及线上交互尚待发布后核验。下方2026-10-16发布记录为历史，不能用来声称本轮已上线。
+
+## 2026-10-19 本次激活坐标修复
+
+- 根因：按钮构造时先注册capture click并同步派发change；控制器和嵌入演示后注册的同宿主capture click来不及记录本次坐标，导致首击回退默认点、后续动作沿用上一次点，键盘也可能残留。
+- 最小修复：按钮在change上附加本次 `event.point`（client视口坐标，键盘/程序click为null），保持原detail字符串；控制器及iframe桥直接消费，删除额外click监听与坐标缓存。原按钮视觉、历史v1～v4文件及LICENSE未改。
+- 独立Chromium151、390×844触摸/1440×844鼠标：定向反例旧实现16项失败，修复后两尺寸各10项通过，页面错误0；覆盖首击两端、快速第二击、Enter/Space、程序click、销毁解绑及iframe传点。报告在ignored `test-results/coordinates-before.json` / `coordinates-after.json`。
+- 阶段验证：`npm run check`、`tests/browser_smoke.py`、`tests/version_smoke.py`均通过；保留持久化、系统跟随、减少动态、快速反切、抽屉与正文缓存解耦、滚动/图片/表格边界。不是目标手机真机或生产shydoc验收。
+- 发布定向脚本支持 `--base`，可直接验收 GitHub Pages 的实际资源；不把本地临时服务结果冒充线上结果。保持 v1～v4、LICENSE 不变，不发布标签、GitHub Release 或 npm。
+
+## 2026-10-16 已发布版本归档
+
 日期：2026-10-16。目标：发布v5.0独立组件与AI接入资料，更新五版本对比页及README，按用户明确授权上传原GitHub仓库。
 
 ## 已整理

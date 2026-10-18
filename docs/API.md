@@ -13,6 +13,7 @@
 | `disabled` | 有属性即禁用点击/键盘，暴露 `aria-disabled` |
 | `aria-label` | 宿主可提供中文名称；组件默认具备 switch 语义与 `aria-checked` |
 | `change` | 用户动作才派发，`detail` 为 `light` 或 `dark`；冒泡且跨 Shadow DOM |
+| `change` 的 `event.point` | 本次指针点击的视口坐标 `{x:clientX,y:clientY}`；键盘或程序 `.click()` 为 `null`。不改变原 `detail` 字符串 |
 | Enter / Space | 等价于一次切换；程序 `.click()` 也遵守 disabled |
 
 默认移除常驻随机云朵定时器，hover仅在精细指针且支持悬停时运行，减少动态效果时禁用内部过渡。与旧演示的常驻微动不承诺逐帧相同；太阳/月亮/云朵等视觉结构保留。
@@ -41,7 +42,7 @@
 - `await controller.followSystem()`：清除手动偏好，按当前系统主题切换；以后系统变化不写手动偏好，也不沿用旧点击位置。
 - `controller.destroy()`：取消动画、收束状态、恢复临时 transition、移除覆盖层及所有监听、销毁 wave；保留当前主题与用户选择，不删除数据。再次创建控制器可继续使用。
 
-捕获按钮自己的点击坐标，不在文档捕获所有点击。系统和键盘切换使用默认中心上方坐标。localStorage不可用时仍可在当前页工作；跨标签页 storage 事件会同步偏好。
+按钮在同步派发 `change` 前绑定本次 `event.point`，控制器直接消费，不缓存全局点击或另等同一按钮的 `click` 监听。后注册的同阶段监听可能晚于同步 `change`，不能用来取得本次点。坐标使用视口 CSS 像素；不要加 `scrollY`、换成 `pageX/pageY` 或乘设备像素比。系统、键盘和程序 `.click()` 使用默认中心上方坐标，不复用旧指针点。localStorage不可用时仍可在当前页工作；跨标签页 storage 事件会同步偏好。
 
 ## 普通流适配器：`createFlowWave(options)`
 

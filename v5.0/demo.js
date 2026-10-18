@@ -7,14 +7,9 @@ const embedded = root.dataset.embedded === 'true';
 if (embedded) {
   // 对比页是唯一状态源；此分支不创建存储/系统监听或页面动效。
   button.setAttribute('size', '1.5');
-  let point = null;
-  button.addEventListener('click', event => {
-    point = event.detail > 0 ? { x:event.clientX, y:event.clientY } : null;
-  }, true);
   button.addEventListener('change', event => {
     if (event.detail !== 'light' && event.detail !== 'dark') return;
-    parent.postMessage({ type:'shiran-demo-change', theme:event.detail, point }, location.origin);
-    point = null;
+    parent.postMessage({ type:'shiran-demo-change', theme:event.detail, point:event.point || null }, location.origin);
   });
   window.addEventListener('message', event => {
     if (event.origin !== location.origin || event.source !== parent || event.data?.type !== 'shiran-demo-theme') return;
