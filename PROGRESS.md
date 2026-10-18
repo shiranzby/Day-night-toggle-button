@@ -1,6 +1,6 @@
 # v5.0 当前交付
 
-当前状态（2026-10-19）：用户已授权将点击坐标修复推送 GitHub，本地验证完成且远端无新增提交，正在正常发布 `master`；Pages 对应提交及线上交互尚待发布后核验。下方2026-10-16发布记录为历史，不能用来声称本轮已上线。
+当前状态（2026-10-19）：本轮点击坐标修复已正常推送 `master`，代码提交 `909d1808cc7233edf0d9f2d4789bc8468710be53`；对应 GitHub Pages 工作流成功，真实线上交互与资源核验通过。下方2026-10-16为历史发布记录。
 
 ## 2026-10-19 本次激活坐标修复
 
@@ -9,6 +9,14 @@
 - 独立Chromium151、390×844触摸/1440×844鼠标：定向反例旧实现16项失败，修复后两尺寸各10项通过，页面错误0；覆盖首击两端、快速第二击、Enter/Space、程序click、销毁解绑及iframe传点。报告在ignored `test-results/coordinates-before.json` / `coordinates-after.json`。
 - 阶段验证：`npm run check`、`tests/browser_smoke.py`、`tests/version_smoke.py`均通过；保留持久化、系统跟随、减少动态、快速反切、抽屉与正文缓存解耦、滚动/图片/表格边界。不是目标手机真机或生产shydoc验收。
 - 发布定向脚本支持 `--base`，可直接验收 GitHub Pages 的实际资源；不把本地临时服务结果冒充线上结果。保持 v1～v4、LICENSE 不变，不发布标签、GitHub Release 或 npm。
+
+### 本轮发布核验
+
+- [GitHub Pages 工作流 39159775648](https://github.com/shiranzby/Day-night-toggle-button/actions/runs/39159775648) 对应上述代码提交，结果为 `completed/success`。正常快进推送，无强推或历史改写。
+- 线上 `components/theme-button.js`、`components/theme-controller.js`、`v5.0/demo.js` 的实际响应字节与发布提交逐一一致。
+- 直接访问 [五版本对比](https://shiranzby.github.io/Day-night-toggle-button/) / [独立 v5.0](https://shiranzby.github.io/Day-night-toggle-button/v5.0/) / [长页示例](https://shiranzby.github.io/Day-night-toggle-button/examples/long-page.html)：390×844触摸与1440×844鼠标的坐标回归各10项通过，脚本错误和关键资源失败均为0。
+- 独立 v5.0 首次左端及第二次右端点击，移动轻量圆盘、桌面原生 VT 的真实中心均与本次浏览器事件一致；独立页刷新保留偏好、恢复系统跟随、iframe按钮驱动五版本同步及移动宽度均通过。
+- 当前线上手机/桌面截图已查看，无新增裁切或宽度问题。证据只保留在 ignored `test-results/coordinates-online-20261019.json`、`release-online.json` 与 `release-online-*.png`，不上传本机报告。这不是目标手机真机或所有物理帧无闪烁的证明。
 
 ## 2026-10-16 已发布版本归档
 
